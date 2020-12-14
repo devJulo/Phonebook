@@ -2,6 +2,8 @@ const { response } = require('express')
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [{
     id: 1,
     name: "Arto Hellas",
@@ -48,6 +50,34 @@ app.get('/api/persons/:id', (request, response) => {
             error: 'content missing'
         })
     }
+    response.json(person)
+})
+
+const generateId = () => {
+    const randomId = Math.floor(Math.random() * Math.floor(1000000))
+    return randomId
+}
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    const finder = persons.find(person => {
+        return person.name === body.name
+    })
+    if(!body.name || !body.number || finder){
+            console.log("body.name is missing")
+        return (response.status(400).json({
+            error: 'content missing'
+        }))
+    }
+    const person = {
+        name: body.name,
+        number: body.number,
+        date: new Date(),
+        id: generateId()
+    }
+    
+    persons = persons.concat(person)
+
     response.json(person)
 })
 
