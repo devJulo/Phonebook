@@ -1,3 +1,4 @@
+const { response } = require('express')
 const express = require('express')
 const app = express()
 
@@ -27,9 +28,30 @@ app.get('/', (request, response) =>{
     response.send('<h1>My first Backend Server</h1>')
 })
 
+app.get('/info', (request, response) => {
+    const date = new Date().toString()
+    const peopleNumber = persons.length
+    response.send(`<p>Phonebook has info for ${peopleNumber} people</p><p>${date} (European West Time)</p>`)
+})
+
 app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
+
+app.get('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    const person = persons.find(person => {
+        return person.id === id
+    })
+    if(!person){
+        return response.status(404).json({
+            error: 'content missing'
+        })
+    }
+    response.json(person)
+})
+
+app.get('')
 
 const PORT = 3001
 app.listen(PORT, () => {
