@@ -63,12 +63,22 @@ app.post('/api/persons', (request, response) => {
     const finder = persons.find(person => {
         return person.name === body.name
     })
-    if(!body.name || !body.number || finder){
-            console.log("body.name is missing")
+    if(!body.name){
         return (response.status(400).json({
-            error: 'content missing'
+            error: 'name missing'
         }))
     }
+    if(!body.number){
+        return (response.status(400).json({
+            error: 'number missing'
+        }))
+    }
+    if(!finder){
+        return (response.status(400).json({
+            error: 'name must be unique'
+        }))
+    }
+    
     const person = {
         name: body.name,
         number: body.number,
