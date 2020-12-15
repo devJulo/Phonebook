@@ -13,7 +13,7 @@ morgan.token('body', (req, res) => JSON.stringify(req.body))
 const logger = morgan(':method :url :status :res[content-length] - :response-time ms - :body')
 app.use(logger)
 
-
+app.use(express.static('build'))
 
 let persons = [{
     id: 1,
