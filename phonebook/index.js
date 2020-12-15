@@ -1,8 +1,17 @@
 const { response } = require('express')
 const express = require('express')
+const { token } = require('morgan')
+const morgan = require('morgan')
+
 const app = express()
 
 app.use(express.json())
+
+morgan.token('body', (req, res) => JSON.stringify(req.body))
+const logger = morgan(':method :url :status :res[content-length] - :response-time ms - :body')
+app.use(logger)
+
+
 
 let persons = [{
     id: 1,
@@ -63,6 +72,7 @@ app.post('/api/persons', (request, response) => {
     const finder = persons.find(person => {
         return person.name === body.name
     })
+    
     if(!body.name){
         return (response.status(400).json({
             error: 'name missing'
@@ -73,7 +83,7 @@ app.post('/api/persons', (request, response) => {
             error: 'number missing'
         }))
     }
-    if(!finder){
+    if(finder){
         return (response.status(400).json({
             error: 'name must be unique'
         }))
