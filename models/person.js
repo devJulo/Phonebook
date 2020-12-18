@@ -1,15 +1,16 @@
 const mongoose = require('mongoose')
 
-if(process.argv.length < 3) {
-    console.log('Please provide the password as an argument: node mongo.js <password>')
-    process.exit(1)
-}
+const url = process.env.MONGODB_URI
 
-const password = process.argv[2]
+console.log('connecting to', url)
 
-const url = `mongodb+srv://Julien:${password}@cluster0.shlcb.mongodb.net/PhonebookDB?retryWrites=true&w=majority`
-
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true})
+mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true})
+    .then(result => {
+        console.log('connected to MongoDB')
+    })
+    .catch((error) => {
+        console.log('error connecting to MongoDB', error.message)
+    })
 
 const personSchema = new mongoose.Schema({
     name: String,
@@ -17,13 +18,19 @@ const personSchema = new mongoose.Schema({
     date: Date,
 })
 
-const Person = mongoose.model('Person', personSchema)
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString()
+        delete returnedObject._id
+        delete returnedObject.__v
+    }
+})
 
-if (process.argv.length === 3) {
+/*if (process.argv.length === 3) {
     Person.find({}).then(result => {
         console.log('phonebook:')
         result.forEach(person => {
-            console.log(person.name,' ', person.number)
+            console.log(person.name,' ', person.number, ' ', person.id)
         })
         mongoose.connection.close()
     })
@@ -47,8 +54,7 @@ else {
     console.log('Please provide arguments like so: node mongo.js <password> <"name"> <"number">')
     mongoose.connection.close()
 }
+*/
 
-
-
-
+module.exports = mongoose.model('Person', personSchema)
 
