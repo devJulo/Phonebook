@@ -13,9 +13,18 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindA
     })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-    date: Date,
+    name: {
+        type: String,
+        required: true
+    },
+    number: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    }
 })
 
 personSchema.set('toJSON', {

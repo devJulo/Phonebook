@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { response } = require('express')
+const { response, json } = require('express')
 const express = require('express')
 const { token } = require('morgan')
 const morgan = require('morgan')
@@ -54,36 +54,37 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
-    Person.findOne({ name: body.name },(err, result) => {
-        if (!body.name || !body.number) {
-            const error = new Error()
-            error.name = 'CastError'
-            return next(error)
-        }
-        else if (result) {
-            const error = new Error()
-            error.name = 'NameConflict'
-            return next(error)
+
+    const person = new Person({
+        name: body.name,
+        number: body.number,
+        date: new Date()
+    })
+
+    Person.findOne({ name: body.name}, (err, result) => {
+        if (result) {
+            return response.status(400).json({ error: 'name already created'})
         }
         else {
-            const person = new Person({
-                name: body.name,
-                number: body.number,
-                date: new Date()
-            })
-        
             person.save()
-                .then(savedPerson => {
-                response.json(person)
-                })
-                .catch(error => next(error))
+            .then(savedPerson => savedPerson.toJSON())
+            .then(savedAndFormattedPerson => {
+                response.json(savedAndFormattedPerson)
+            })
+            .catch(error => next(error))
         }
-    } )
+    })
+
+    
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     const body = request.body
+
+    if (body.number === '') {
+        return response.status(400).json({ error : 'number is missing'})
+    } 
 
     const person = {
         number: body.number
@@ -121,11 +122,8 @@ const errorHandler = (error, request, response, next) => {
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
     }
-    if (error.name === 'IncompletedPost') {
-        return response.status(400).send({ error: 'name or number missing'})
-    }
-    if (error.name === 'NameConflict') {
-        return response.status(400).send({ error: 'name already exist'})
+    else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
     
     next(error)
