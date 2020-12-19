@@ -10,7 +10,8 @@
     "build:ui": "rm -rf build && cd ~/Documents/FullStack-Project/part2/phonebook && npm run build --prod && cp -r build ~/Documents/Part3",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "author": "Julien Français",
   "license": "MIT",
@@ -23,6 +24,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^7.16.0",
+    "eslint-plugin-react": "^7.21.5",
     "nodemon": "^2.0.6"
   }
 }
