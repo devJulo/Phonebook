@@ -10,6 +10,7 @@ const Person = require('./models/person')
 
 
 
+
 app.use(cors())
 app.use(express.json())
 app.use(express.static('build'))
@@ -61,40 +62,43 @@ app.post('/api/persons', (request, response, next) => {
         date: new Date()
     })
 
-    Person.findOne({ name: body.name}, (err, result) => {
-        if (result) {
-            return response.status(400).json({ error: 'name already created'})
-        }
-        else {
-            person.save()
-            .then(savedPerson => savedPerson.toJSON())
-            .then(savedAndFormattedPerson => {
-                response.json(savedAndFormattedPerson)
-            })
-            .catch(error => next(error))
-        }
+    person.save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then(savedAndFormattedPerson => {
+        response.json(savedAndFormattedPerson)
     })
-
-    
+    .catch(error => next(error))    
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     const body = request.body
 
-    if (body.number === '') {
-        return response.status(400).json({ error : 'number is missing'})
-    } 
-
-    const person = {
-        number: body.number
-    }
-
-    Person.findByIdAndUpdate(id, person, { new: true })
-        .then(updatedPerson => {
-            response.json(updatedPerson)
+    Person.findById(id)
+        .then(person => {
+            person.number = body.number
+            person.save()
+            .then(savedPerson => savedPerson.toJSON())
+            .then(savedAndFormattedPerson => {
+                response.json(savedAndFormattedPerson)
+            })
+            .catch(error => next(error)) 
         })
-        .catch(error => next(error))
+    /*if (body.number.length < 10) {
+        return response.status(400).send({ error: 'provide a valid number'})
+    }
+    else {
+        const person = {
+            number: body.number
+        }
+        
+        Person.findByIdAndUpdate(id, person, { new: true })
+            .then(updatedPerson => {
+                response.json(updatedPerson)
+            })
+            .catch(error => next(error))
+    }*/
+    
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
