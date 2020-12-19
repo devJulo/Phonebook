@@ -20,7 +20,7 @@ app.use(logger)
 
 
 
-app.get('/', (request, response) =>{
+app.get('/', (request, response) => {
   response.send('<h1>My first Backend Server</h1>')
 })
 
@@ -28,7 +28,6 @@ app.get('/info', (request, response) => {
   const date = new Date().toString()
   Person.find({}).count()
     .then(numberPeople => response.send(`<p>Phonebook has info for ${numberPeople} people</p><p>${date} (European West Time)</p>`))
-    
 })
 
 app.get('/api/persons', (request, response) => {
@@ -65,7 +64,7 @@ app.post('/api/persons', (request, response, next) => {
     .then(savedAndFormattedPerson => {
       response.json(savedAndFormattedPerson)
     })
-    .catch(error => next(error))    
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -80,23 +79,8 @@ app.put('/api/persons/:id', (request, response, next) => {
         .then(savedAndFormattedPerson => {
           response.json(savedAndFormattedPerson)
         })
-        .catch(error => next(error)) 
+        .catch(error => next(error))
     })
-    /*if (body.number.length < 10) {
-        return response.status(400).send({ error: 'provide a valid number'})
-    }
-    else {
-        const person = {
-            number: body.number
-        }
-        
-        Person.findByIdAndUpdate(id, person, { new: true })
-            .then(updatedPerson => {
-                response.json(updatedPerson)
-            })
-            .catch(error => next(error))
-    }*/
-    
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -127,16 +111,14 @@ const errorHandler = (error, request, response, next) => {
   else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
   }
-  
   next(error)
 }
-  
 app.use(errorHandler)
 
 
 
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
